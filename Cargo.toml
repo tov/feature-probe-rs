@@ -2,7 +2,7 @@
 name = "feature-probe"
 version = "0.1.2-alpha.0"
 authors = ["Jesse A. Tov <jesse.tov@gmail.com>"]
-description = "Probe for rustc features from build.rs"
+description = "Probe for Rust language features from build.rs"
 repository = "https://github.com/tov/feature-probe-rs"
 readme = "README.md"
 license = "MIT/Apache-2.0"

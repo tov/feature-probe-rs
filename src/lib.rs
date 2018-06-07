@@ -3,9 +3,7 @@
 //! compile parts of our libraries or programs. It's possible to allow users to
 //! specify what features to enable, but detection is better, because users get
 //! all the features that their version of Rust supports. And while we could check
-//! the rustc version, it's better to probe for individual features. That way,
-//! code will work both on nightly, and on stable releases after particular features
-//! stabilize, without changes.
+//! the rustc version, it's better to probe for individual features.
 //!
 //! ## Usage
 //!
