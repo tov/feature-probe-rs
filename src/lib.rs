@@ -12,7 +12,7 @@
 //! It’s [on crates.io](https://crates.io/crates/feature-probe), so you can add
 //!
 //! ```toml
-//! [dev-dependencies]
+//! [build-dependencies]
 //! feature-probe = "0.1.0"
 //! ```
 //!
