@@ -16,6 +16,29 @@
 //! feature-probe = "0.1.0"
 //! ```
 //!
+//! Then add to your `build.rs`:
+//!
+//! ```no_compile
+//! extern crate feature_probe;
+//!
+//! use feature_probe::Probe;
+//! ```
+//!
+//! Then you can probe for features such as types or expressions. For example:
+//!
+//! ```no_compile
+//! fn main () {
+//!     let probe = Probe::new();
+//!
+//!     if probe.probe_type("i128") {
+//!         println!("cargo:rustc-cfg=int_128");
+//!     }
+//!
+//!     if probe.probe_type("::std::ops::RangeInclusive<u64>") {
+//!         println!("cargo:rustc-cfg=inclusive_range");
+//!     }
+//! }
+//! ```
 
 use std::env;
 use std::ffi::OsString;
