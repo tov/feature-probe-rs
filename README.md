@@ -19,7 +19,7 @@ It’s [on crates.io](https://crates.io/crates/feature-probe), so you can add
 
 ```toml
 [build-dependencies]
-feature-probe = "0.1.0"
+feature-probe = "0.1.1"
 ```
 
 Then add to your `build.rs`:

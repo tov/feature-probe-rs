@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/feature-probe/0.1.0")]
+#![doc(html_root_url = "https://docs.rs/feature-probe/0.1.1")]
 //! To support multiple versions of Rust, it's often necessary to conditionally
 //! compile parts of our libraries or programs. It's possible to allow users to
 //! specify what features to enable, but detection is better, because users get
@@ -13,7 +13,7 @@
 //!
 //! ```toml
 //! [build-dependencies]
-//! feature-probe = "0.1.0"
+//! feature-probe = "0.1.1"
 //! ```
 //!
 //! Then add to your `build.rs`:
