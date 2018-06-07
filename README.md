@@ -1,5 +1,10 @@
 # feature-probe-rs: probe for rustc features from `build.rs`
 
+[![Build Status](https://travis-ci.org/tov/feature-probe-rs.svg?branch=master)](https://travis-ci.org/tov/feature-probe-rs)
+[![Crates.io](https://img.shields.io/crates/v/feature-probe.svg?maxAge=2592000)](https://crates.io/crates/feature-probe)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE-MIT)
+[![License: Apache 2.0](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](LICENSE-APACHE)
+
 To support multiple versions of Rust, it's often necessary to conditionally
 compile parts of our libraries or programs. It's possible to allow users to
 specify what features to enable, but detection is better, because users get
