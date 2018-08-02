@@ -47,7 +47,7 @@ use std::process::{Command, Stdio};
 
 /// A probe object, which is used for probing for features.
 ///
-/// Create this with [`ProbeProbeo::new`](#method.new), and then probe with
+/// Create this with [`Probe::new`](#method.new), and then probe with
 /// one of the probing methods.
 #[derive(Debug)]
 pub struct Probe {
