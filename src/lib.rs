@@ -58,6 +58,7 @@ use std::sync::Mutex;
 pub struct Probe {
     debug: bool,
     emit_type: &'static str,
+    retries: usize,
     rustc: PathBuf,
 }
 
@@ -96,6 +97,7 @@ impl Probe {
         Probe {
             debug: false,
             emit_type: "obj",
+            retries: 0,
             rustc: PathBuf::from(env_var_or("RUSTC", "rustc")),
         }
     }
@@ -114,6 +116,14 @@ impl Probe {
     /// Default is `obj`.
     pub fn emit(&mut self, emit_type: &'static str) {
         self.emit_type = emit_type;
+    }
+
+    /// Configures the probe to retry this many times if starting
+    /// or communicating with `rustc` fails.
+    ///
+    /// Default is `0`.
+    pub fn retries(&mut self, retries: usize) {
+        self.retries = retries;
     }
 
     /// Sets the name or path to use for running `rustc`.
@@ -230,15 +240,29 @@ impl Probe {
            .stdout(Stdio::null())
            .stderr(Stdio::null());
 
+        retry_n_times(self.retries, || {
             let _guard = RUSTC_MUTEX.lock().unwrap();
             let mut child = cmd.spawn()?;
             child.stdin.as_mut().unwrap().write_all(code.as_bytes())?;
             Ok(child.wait()?.success())
+        })
     }
 
     fn build_emit(&self) -> String {
         format!("{}={}", self.emit_type, NULL_DEVICE)
     }
+}
+
+fn retry_n_times<T, E, F>(mut n: usize, mut f: F) -> Result<T, E>
+where F: FnMut() -> Result<T, E> {
+    let mut result = f();
+
+    while result.is_err() && n > 0 {
+        result = f();
+        n -= 1;
+    }
+
+    result
 }
 
 impl Default for Probe {
