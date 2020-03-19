@@ -44,6 +44,7 @@
 extern crate lazy_static;
 
 use std::env;
+use std::path::PathBuf;
 use std::ffi::OsString;
 use std::io::{self, Write};
 use std::process::{Command, Stdio};
@@ -55,8 +56,8 @@ use std::sync::Mutex;
 /// one of the probing methods.
 #[derive(Debug)]
 pub struct Probe {
-    rustc:   OsString,
     out_dir: OsString,
+    rustc: PathBuf,
 }
 
 
@@ -87,9 +88,17 @@ impl Probe {
     /// ```
     pub fn new() -> Self {
         Probe {
-            rustc:   env_var_or("RUSTC",   "rustc"),
             out_dir: env_var_or("OUT_DIR", "target"),
+            rustc: PathBuf::from(env_var_or("RUSTC", "rustc")),
         }
+    }
+
+    /// Sets the name or path to use for running `rustc`.
+    ///
+    /// Default is value of environment `RUSTC` if set, `"rustc"`
+    /// otherwise.
+    pub fn rustc<P: Into<PathBuf>>(&mut self, rustc: P) {
+        self.rustc = rustc.into();
     }
 
     /// Probes for the existence of the given type by name.

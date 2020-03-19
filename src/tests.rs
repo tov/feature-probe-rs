@@ -68,6 +68,7 @@ probe_tests! {
         string          {   probe_type("String") }
         qual_string     {   probe_type("std::string::String") }
         static_slice    {   probe_type("&'static str") }
+        // str_slice       {   probe_type("&str") }
         str_unsized     {   probe_type("str") }
         vec_opt_bool    {   probe_type("Vec<Option<bool>>") }
     }
