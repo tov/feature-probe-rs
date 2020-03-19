@@ -1,12 +1,18 @@
 use super::Probe;
 
+fn build_probe() -> Probe {
+    Probe::new()
+}
+
 macro_rules! new_probe {
-    [ $(prop:ident=$val:expr),* $(,)? ] =>
     {
+        $( #[ $($prop:ident=$val:expr),* $(,)? ] )?
+        $(, $qual:ident)?
+    } => {
         {
             #[allow(unused_mut)]
-            let mut probe = Probe::new();
-            $( probe.$prop($val); )*
+            let mut probe = $($qual::)? build_probe();
+            $($( probe.$prop($val); )*)?
             probe
         }
     }
@@ -14,33 +20,38 @@ macro_rules! new_probe {
 
 macro_rules! probe_test {
     {
-        // $(#$prop:tt)?
+        $(#$prop:tt)?
         $name:ident { $meth:ident($($arg:tt)*) }
     } => {
         #[test]
         fn $name() {
-            let o = new_probe![/*$($prop:tt)?*/];
+            let o = new_probe!($(#$prop)?);
             assert!( o.$meth($($arg)*) );
         }
     };
 
     {
-        // $(#$prop:tt)?
+        $(#$prop:tt)?
         $name:ident { ! $meth:ident($($arg:tt)*) }
     } => {
         #[test]
         fn $name() {
-            let o = new_probe![/*$($prop:tt)?*/];
+            let o = new_probe!($(#$prop)?);
             assert!( ! o.$meth($($arg)*) );
         }
     };
 
     {
-        // $(#$prop:tt)?
+        $(#$prop:tt)?
         $name:ident { mod $($inner:tt)* }
     } => {
         mod $name {
             use super::*;
+
+            fn build_probe() -> Probe {
+                new_probe!($(#$prop)?, super)
+            }
+
             probe_tests! { $($inner)* }
         }
     }
@@ -49,12 +60,14 @@ macro_rules! probe_test {
 macro_rules! probe_tests {
     {
         $(
+        $(#$prop:tt)?
         $name:ident { $($body:tt)* }
         )*
     } =>
     {
         $(
         probe_test! {
+            $(#$prop)?
             $name { $($body)* }
         }
         )*
@@ -62,6 +75,7 @@ macro_rules! probe_tests {
 }
 
 probe_tests! {
+
     good_types          { mod
         u32             {   probe_type("u32") }
         i16             {   probe_type("i16") }
@@ -92,5 +106,6 @@ probe_tests! {
         weird2          { ! probe_expression("/a.*b/g") }
         weird3          { ! probe_expression("$Package::Hash{ 'the key'}") }
     }
+    
 }
 
