@@ -108,6 +108,14 @@ impl Probe {
         self.debug = debug;
     }
 
+    /// Configures the probe to ask `rustc` to emit a different
+    /// output type.
+    ///
+    /// Default is `obj`.
+    pub fn emit(&mut self, emit_type: &'static str) {
+        self.emit_type = emit_type;
+    }
+
     /// Sets the name or path to use for running `rustc`.
     ///
     /// Default is value of environment `RUSTC` if set, `"rustc"`
