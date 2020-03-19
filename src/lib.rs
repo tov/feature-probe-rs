@@ -40,10 +40,14 @@
 //!
 //! This crate supports Rust version 1.16.0 and newer.
 
+#[macro_use]
+extern crate lazy_static;
+
 use std::env;
 use std::ffi::OsString;
 use std::io::{self, Write};
 use std::process::{Command, Stdio};
+use std::sync::Mutex;
 
 /// A probe object, which is used for probing for features.
 ///
@@ -53,6 +57,11 @@ use std::process::{Command, Stdio};
 pub struct Probe {
     rustc:   OsString,
     out_dir: OsString,
+}
+
+
+lazy_static! {
+    static ref RUSTC_MUTEX: Mutex<()> = Mutex::new(());
 }
 
 impl Probe {
@@ -153,6 +162,8 @@ impl Probe {
     /// # }
     /// ```
     pub fn probe_result(&self, code: &str) -> io::Result<bool> {
+        let _guard = RUSTC_MUTEX.lock().unwrap();
+        
         let mut child = Command::new(&self.rustc)
             .arg("--out-dir")
             .arg(&self.out_dir)
