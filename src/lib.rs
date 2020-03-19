@@ -224,7 +224,6 @@ impl Probe {
     /// # Examples
     ///
     /// ```
-    /// # extern crate feature_probe;
     /// # fn main() {
     /// use feature_probe::Probe;
     ///
@@ -242,7 +241,6 @@ impl Probe {
     /// # Examples
     ///
     /// ```
-    /// # extern crate feature_probe;
     /// # fn main() {
     /// use feature_probe::Probe;
     ///
