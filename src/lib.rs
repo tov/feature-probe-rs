@@ -117,7 +117,7 @@ impl Probe {
     /// assert!( ! probe.probe_type("u512") );
     /// ```
     pub fn probe_type(&self, type_name: &str) -> bool {
-        self.probe(&format!("pub type T = {}; fn main() {{ }}", type_name))
+        self.probe(&format!("fn probe_fun(_: Box<{}>) {{}} fn main() {{}} ", type_name))
     }
 
     /// Probes whether the given expression can be compiled.
@@ -131,7 +131,7 @@ impl Probe {
     /// assert!(   probe.probe_expression("3 + 4") );
     /// assert!( ! probe.probe_expression("3 + true") );
     pub fn probe_expression(&self, expression: &str) -> bool {
-        self.probe(&format!("fn main() {{ {}; }}", expression))
+        self.probe(&format!("fn main() {{ let _ = {}; }}", expression))
     }
 
     /// Probes for whether a whole program can be compiled.
