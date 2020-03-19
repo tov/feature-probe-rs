@@ -134,6 +134,27 @@ impl Probe {
         self.probe(&format!("fn main() {{ let _ = {}; }}", expression))
     }
 
+    /// Probes whether the given expression can be compiled.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use feature_probe::Probe;
+    ///
+    /// let probe = Probe::new();
+    /// assert!( ! probe.probe_expression(      "Vec::new()") );
+    /// assert!(   probe.probe_typed_expression("Vec::new()", "Vec<u16>") );
+    /// assert!(   probe.probe_typed_expression("Vec::new()", "Vec<u64>") );
+    /// ```
+    ///
+    /// assert!(   probe.probe_typed_expression("3  + 4", "u32") );
+    /// assert!(   probe.probe_typed_expression("3  + 4", "f32") );
+    /// assert!( ! probe.probe_typed_expression("3. + 4", "u32") );
+    /// assert!(   probe.probe_typed_expression("3. + 4", "f32") );
+    pub fn probe_typed_expression(&self, expression: &str, type_name: &str) -> bool {
+        self.probe(&format!("fn main() {{ let _: {} = {}; }}", type_name, expression))
+    }
+
     /// Probes for whether a whole program can be compiled.
     ///
     /// # Panics

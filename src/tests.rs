@@ -84,6 +84,7 @@ probe_tests! {
         add_int_exp     {   probe_expression("5 + 6") }
         range_exp       {   probe_expression("0..10") }
         vec_new_amb     { ! probe_expression("Vec::new()") }
+        vec_new_unamb   {   probe_typed_expression("Vec::new()", "Vec<u16>") }
     }
 
     perl_expressions    { mod
