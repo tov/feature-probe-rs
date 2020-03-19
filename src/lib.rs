@@ -56,7 +56,7 @@ use std::sync::Mutex;
 /// one of the probing methods.
 #[derive(Debug)]
 pub struct Probe {
-    out_dir: OsString,
+    emit_type: &'static str,
     rustc: PathBuf,
 }
 
@@ -65,14 +65,19 @@ lazy_static! {
     static ref RUSTC_MUTEX: Mutex<()> = Mutex::new(());
 }
 
+#[cfg(target_os = "windows")]
+const NULL_DEVICE: &'static str = "NUL";
+
+#[cfg(not(target_os = "windows"))]
+const NULL_DEVICE: &'static str = "/dev/null";
+
+
 impl Probe {
     /// Creates a new [`Probe`](struct.Probe.html) object with a default
     /// configuration.
     ///
     /// In particular, it consults the environment variable `"RUSTC"` to determine
-    /// what Rust compiler to use, and the environment variable `"OUT_DIR"` to
-    /// determine where to put object files. If these are not set, they default to
-    /// the values `"rustc"` and `"target"`, respectively.
+    /// what Rust compiler to use. If this are not set it defaults to `"rustc"`.
     ///
     /// # Panics
     ///
@@ -88,7 +93,7 @@ impl Probe {
     /// ```
     pub fn new() -> Self {
         Probe {
-            out_dir: env_var_or("OUT_DIR", "target"),
+            emit_type: "obj",
             rustc: PathBuf::from(env_var_or("RUSTC", "rustc")),
         }
     }
@@ -192,22 +197,23 @@ impl Probe {
     /// # }
     /// ```
     pub fn probe_result(&self, code: &str) -> io::Result<bool> {
-        let _guard = RUSTC_MUTEX.lock().unwrap();
-        
-        let mut child = Command::new(&self.rustc)
-            .arg("--out-dir")
-            .arg(&self.out_dir)
-            .arg("--emit=obj")
-            .arg("-")
-            .stdin(Stdio::piped())
-            .spawn()?;
+        let mut cmd = Command::new(&self.rustc);
 
-        child
-            .stdin
-            .as_mut().unwrap()
-            .write_all(code.as_bytes())?;
+        cmd.arg("--emit")
+           .arg(&self.build_emit())
+           .arg("-")
+           .stdin(Stdio::piped())
+           .stdout(Stdio::null())
+           .stderr(Stdio::null());
 
-        Ok(child.wait()?.success())
+            let _guard = RUSTC_MUTEX.lock().unwrap();
+            let mut child = cmd.spawn()?;
+            child.stdin.as_mut().unwrap().write_all(code.as_bytes())?;
+            Ok(child.wait()?.success())
+    }
+
+    fn build_emit(&self) -> String {
+        format!("{}={}", self.emit_type, NULL_DEVICE)
     }
 }
 
