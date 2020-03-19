@@ -302,6 +302,3 @@ impl Default for Probe {
 fn env_var_or(var: &str, default: &str) -> OsString {
     env::var_os(var).unwrap_or_else(|| default.into())
 }
-
-#[cfg(test)]
-mod tests;
