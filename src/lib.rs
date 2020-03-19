@@ -38,7 +38,7 @@
 //! }
 //! ```
 //!
-//! This crate supports Rust version 1.16.0 and later.
+//! This crate supports Rust version 1.16.0 and newer.
 
 use std::env;
 use std::ffi::OsString;

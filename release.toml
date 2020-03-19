@@ -1,6 +1,30 @@
-pre-release-replacements = [
-  { file="README.md", search="feature-probe = \"[0-9.]*\"", replace="feature-probe = \"{{version}}\"" },
-  { file="src/lib.rs", search="feature-probe = \"[0-9.]*\"", replace="feature-probe = \"{{version}}\"" },
-  { file="src/lib.rs", search="https://docs[.]rs/feature-probe/[0-9.]*", replace="https://docs.rs/feature-probe/{{version}}" },
-  { file="CHANGELOG.md", search="\\[Unreleased\\]", replace="[{{version}}] - {{date}}" }
-]
+[[pre-release-replacements]]
+file    = "README.md"
+search  = "feature-probe = \"[0-9.]*\""
+replace = "{{crate_name}} = \"{{version}}\""
+
+[[pre-release-replacements]]
+file    = "src/lib.rs"
+search  = "feature-probe = \"[0-9.]*\""
+replace = "{{crate_name}} = \"{{version}}\""
+
+[[pre-release-replacements]]
+file    = "README.md"
+search  = "Rust version [0-9.]* and newer"
+replace = "Rust version 1.16 and newer"
+
+[[pre-release-replacements]]
+file    = "src/lib.rs"
+search  = "Rust version [0-9.]* and newer"
+replace = "Rust version 1.16 and newer"
+
+[[pre-release-replacements]]
+file    = "CHANGELOG.md"
+search  = "## \\[Next Release\\]"
+replace = "## [Next Release]\n\n## [{{version}}] - {{date}}"
+
+[[pre-release-replacements]]
+file    = "CHANGELOG.md"
+search  = "\\[Next Release\\]: <https://github.com/tov/feature-probe-rs/compare/v[0-9.]*[.][.][.]HEAD>"
+replace = '''[Next Release]: <https://github.com/tov/feature-probe-rs/compare/v{{version}}...HEAD>
+[{{version}}]: <https://github.com/tov/feature-probe-rs/compare/v{{prev_version}}...v{{version}}>'''
