@@ -68,7 +68,6 @@ probe_tests! {
         string          {   probe_type("String") }
         qual_string     {   probe_type("std::string::String") }
         static_slice    {   probe_type("&'static str") }
-        str_slice       {   probe_type("&str") }
         str_unsized     {   probe_type("str") }
         vec_opt_bool    {   probe_type("Vec<Option<bool>>") }
     }
@@ -84,7 +83,6 @@ probe_tests! {
         add_int_exp     {   probe_expression("5 + 6") }
         range_exp       {   probe_expression("0..10") }
         vec_new_amb     { ! probe_expression("Vec::new()") }
-        vec_new_unamb   {   probe_typed_expression("Vec::new()", "Vec<u16>") }
     }
 
     perl_expressions    { mod
