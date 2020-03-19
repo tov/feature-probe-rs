@@ -106,53 +106,59 @@ impl Probe {
 
     /// Adds an argument to the list of arguments to pass to
     /// `rustc`.
-    pub fn arg<S>(&mut self, arg: S)
+    pub fn arg<S>(&mut self, arg: S) -> &mut Self
     where
         S: Into<OsString> {
 
-        self.rustc_args.push(arg.into())
+        self.rustc_args.push(arg.into());
+        self
     }
 
     /// Adds multiple arguments to the list of arguments to pass
     /// to `rustc`.
-    pub fn args<S, I>(&mut self, args: I)
+    pub fn args<S, I>(&mut self, args: I) -> &mut Self
     where
         S: Into<OsString>,
         I: IntoIterator<Item=S> {
 
-        self.rustc_args.extend(args.into_iter().map(S::into))
+        self.rustc_args.extend(args.into_iter().map(S::into));
+        self
     }
 
     /// Configures the probe to show the programs that it
     /// attempts to compile.
     ///
     /// Default is `false`.
-    pub fn debug(&mut self, debug: bool) {
+    pub fn debug(&mut self, debug: bool) -> &mut Self {
         self.debug = debug;
+        self
     }
 
     /// Configures the probe to ask `rustc` to emit a different
     /// output type.
     ///
     /// Default is `obj`.
-    pub fn emit(&mut self, emit_type: &'static str) {
+    pub fn emit(&mut self, emit_type: &'static str) -> &mut Self {
         self.emit_type = emit_type;
+        self
     }
 
     /// Configures the probe to retry this many times if starting
     /// or communicating with `rustc` fails.
     ///
     /// Default is `2`.
-    pub fn retries(&mut self, retries: usize) {
+    pub fn retries(&mut self, retries: usize) -> &mut Self {
         self.retries = retries;
+        self
     }
 
     /// Sets the name or path to use for running `rustc`.
     ///
     /// Default is value of environment `RUSTC` if set, `"rustc"`
     /// otherwise.
-    pub fn rustc<P: Into<PathBuf>>(&mut self, rustc: P) {
+    pub fn rustc<P: Into<PathBuf>>(&mut self, rustc: P) -> &mut Self {
         self.rustc = rustc.into();
+        self
     }
 
     /// Probes for the existence of the given type by name.
