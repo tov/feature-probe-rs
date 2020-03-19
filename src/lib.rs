@@ -98,7 +98,7 @@ impl Probe {
         Probe {
             debug: false,
             emit_type: "obj",
-            retries: 0,
+            retries: 2,
             rustc: PathBuf::from(env_var_or("RUSTC", "rustc")),
             rustc_args: vec![],
         }
@@ -142,7 +142,7 @@ impl Probe {
     /// Configures the probe to retry this many times if starting
     /// or communicating with `rustc` fails.
     ///
-    /// Default is `0`.
+    /// Default is `2`.
     pub fn retries(&mut self, retries: usize) {
         self.retries = retries;
     }
