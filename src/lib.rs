@@ -56,6 +56,7 @@ use std::sync::Mutex;
 /// one of the probing methods.
 #[derive(Debug)]
 pub struct Probe {
+    debug: bool,
     emit_type: &'static str,
     rustc: PathBuf,
 }
@@ -93,9 +94,18 @@ impl Probe {
     /// ```
     pub fn new() -> Self {
         Probe {
+            debug: false,
             emit_type: "obj",
             rustc: PathBuf::from(env_var_or("RUSTC", "rustc")),
         }
+    }
+
+    /// Configures the probe to show the programs that it
+    /// attempts to compile.
+    ///
+    /// Default is `false`.
+    pub fn debug(&mut self, debug: bool) {
+        self.debug = debug;
     }
 
     /// Sets the name or path to use for running `rustc`.
@@ -198,6 +208,12 @@ impl Probe {
     /// ```
     pub fn probe_result(&self, code: &str) -> io::Result<bool> {
         let mut cmd = Command::new(&self.rustc);
+
+        if self.debug {
+            eprintln!("probing: {}", code);
+            cmd.env("RUST_BACKTRACE", "full");
+            cmd.arg("--verbose");
+        }
 
         cmd.arg("--emit")
            .arg(&self.build_emit())
