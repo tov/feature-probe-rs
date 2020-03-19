@@ -54,7 +54,7 @@ use std::sync::Mutex;
 ///
 /// Create this with [`Probe::new`](#method.new), and then probe with
 /// one of the probing methods.
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Probe {
     debug: bool,
     emit_type: &'static str,
