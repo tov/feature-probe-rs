@@ -1,3 +1,5 @@
+#![allow(unused_macros)]
+
 macro_rules! new_probe {
     {
         $( #[ $($prop:ident=$val:expr),* $(,)? ] )?
