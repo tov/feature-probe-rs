@@ -60,6 +60,7 @@ pub struct Probe {
     emit_type: &'static str,
     retries: usize,
     rustc: PathBuf,
+    rustc_args: Vec<OsString>,
 }
 
 
@@ -99,7 +100,27 @@ impl Probe {
             emit_type: "obj",
             retries: 0,
             rustc: PathBuf::from(env_var_or("RUSTC", "rustc")),
+            rustc_args: vec![],
         }
+    }
+
+    /// Adds an argument to the list of arguments to pass to
+    /// `rustc`.
+    pub fn arg<S>(&mut self, arg: S)
+    where
+        S: Into<OsString> {
+
+        self.rustc_args.push(arg.into())
+    }
+
+    /// Adds multiple arguments to the list of arguments to pass
+    /// to `rustc`.
+    pub fn args<S, I>(&mut self, args: I)
+    where
+        S: Into<OsString>,
+        I: IntoIterator<Item=S> {
+
+        self.rustc_args.extend(args.into_iter().map(S::into))
     }
 
     /// Configures the probe to show the programs that it
@@ -236,6 +257,7 @@ impl Probe {
         cmd.arg("--emit")
            .arg(&self.build_emit())
            .arg("-")
+           .args(&self.rustc_args)
            .stdin(Stdio::piped())
            .stdout(Stdio::null())
            .stderr(Stdio::null());
