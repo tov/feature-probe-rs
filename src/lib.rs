@@ -69,7 +69,8 @@ impl Probe {
     ///
     /// # Panics
     ///
-    /// If the child `rustc` cannot be started or communicated with.
+    /// If the child `rustc` cannot be started or communicated with, or
+    /// if a temporary directory cannot be created.
     ///
     /// # Examples
     ///
@@ -138,7 +139,8 @@ impl Probe {
     ///
     /// # Panics
     ///
-    /// If the child `rustc` cannot be started or communicated with.
+    /// If the child `rustc` cannot be started or communicated with, or
+    /// if a temporary directory cannot be created.
     ///
     /// # Examples
     ///
@@ -192,7 +194,8 @@ impl Probe {
     ///
     /// # Panics
     ///
-    /// If the child `rustc` cannot be started or communicated with.
+    /// If the child `rustc` cannot be started or communicated with, or
+    /// if a temporary directory cannot be created.
     ///
     /// # Examples
     ///
