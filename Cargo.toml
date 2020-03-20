@@ -10,4 +10,4 @@ keywords = ["rustc", "features", "probe", "autoconf"]
 categories = ["development-tools"]
 
 [dependencies]
-lazy_static = "1.4"
+tempfile = "3.1"
