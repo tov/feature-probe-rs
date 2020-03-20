@@ -40,15 +40,13 @@
 //!
 //! This crate supports Rust version 1.16.0 and newer.
 
-#[macro_use]
-extern crate lazy_static;
+extern crate tempfile;
 
 use std::env;
 use std::path::PathBuf;
 use std::ffi::OsString;
 use std::io::{self, Write};
 use std::process::{Command, Stdio};
-use std::sync::Mutex;
 
 /// A probe object, which is used for probing for features.
 ///
@@ -58,22 +56,9 @@ use std::sync::Mutex;
 pub struct Probe {
     debug: bool,
     emit_type: &'static str,
-    retries: usize,
     rustc: PathBuf,
     rustc_args: Vec<OsString>,
 }
-
-
-lazy_static! {
-    static ref RUSTC_MUTEX: Mutex<()> = Mutex::new(());
-}
-
-#[cfg(target_os = "windows")]
-const NULL_DEVICE: &'static str = "NUL";
-
-#[cfg(not(target_os = "windows"))]
-const NULL_DEVICE: &'static str = "/dev/null";
-
 
 impl Probe {
     /// Creates a new [`Probe`](struct.Probe.html) object with a default
@@ -98,7 +83,6 @@ impl Probe {
         Probe {
             debug: false,
             emit_type: "obj",
-            retries: 2,
             rustc: PathBuf::from(env_var_or("RUSTC", "rustc")),
             rustc_args: vec![],
         }
@@ -109,7 +93,6 @@ impl Probe {
     pub fn arg<S>(&mut self, arg: S) -> &mut Self
     where
         S: Into<OsString> {
-
         self.rustc_args.push(arg.into());
         self
     }
@@ -120,7 +103,6 @@ impl Probe {
     where
         S: Into<OsString>,
         I: IntoIterator<Item=S> {
-
         self.rustc_args.extend(args.into_iter().map(S::into));
         self
     }
@@ -140,15 +122,6 @@ impl Probe {
     /// Default is `obj`.
     pub fn emit(&mut self, emit_type: &'static str) -> &mut Self {
         self.emit_type = emit_type;
-        self
-    }
-
-    /// Configures the probe to retry this many times if starting
-    /// or communicating with `rustc` fails.
-    ///
-    /// Default is `2`.
-    pub fn retries(&mut self, retries: usize) -> &mut Self {
-        self.retries = retries;
         self
     }
 
@@ -250,45 +223,27 @@ impl Probe {
     /// # }
     /// ```
     pub fn probe_result(&self, code: &str) -> io::Result<bool> {
-        let mut cmd = Command::new(&self.rustc);
-
         if self.debug {
             eprintln!("probing: {}", code);
-            cmd.env("RUST_BACKTRACE", "full");
-            cmd.arg("--verbose");
         }
 
-        cmd.arg("--emit")
-           .arg(&self.build_emit())
-           .arg("-")
+        let out_dir = tempfile::tempdir()?;
+        let mut cmd = Command::new(&self.rustc);
+
+        cmd.arg("-")
+           .arg("--emit")
+           .arg(&self.emit_type)
+           .arg("--out-dir")
+           .arg(out_dir.path())
            .args(&self.rustc_args)
            .stdin(Stdio::piped())
            .stdout(Stdio::null())
            .stderr(Stdio::null());
 
-        retry_n_times(self.retries, || {
-            let _guard = RUSTC_MUTEX.lock().unwrap();
-            let mut child = cmd.spawn()?;
-            child.stdin.as_mut().unwrap().write_all(code.as_bytes())?;
-            Ok(child.wait()?.success())
-        })
+        let mut child = cmd.spawn()?;
+        child.stdin.as_mut().unwrap().write_all(code.as_bytes())?;
+        Ok(child.wait()?.success())
     }
-
-    fn build_emit(&self) -> String {
-        format!("{}={}", self.emit_type, NULL_DEVICE)
-    }
-}
-
-fn retry_n_times<T, E, F>(mut n: usize, mut f: F) -> Result<T, E>
-where F: FnMut() -> Result<T, E> {
-    let mut result = f();
-
-    while result.is_err() && n > 0 {
-        result = f();
-        n -= 1;
-    }
-
-    result
 }
 
 impl Default for Probe {
